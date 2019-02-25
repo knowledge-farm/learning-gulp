@@ -1,8 +1,9 @@
 const gulp = require('gulp');
 const sass = require('gulp-sass');
 const htmlmin = require('gulp-htmlmin');
+const browserSync = require('browser-sync').create();
 
-gulp.task('default', gulp.series(watchFiles))
+gulp.task('default', gulp.series(watch))
 
 // FUNCTIONS
 function htmlMin() {
@@ -13,26 +14,37 @@ function htmlMin() {
                 collapseWhitespace: true
             }
         ))
-        .pipe(gulp.dest('dist'));
+        .pipe(gulp.dest('dist'))
 }
 
+// Compile SASS/SCSS to CSS
 function compileSass() {
     return gulp
-        .src('src/sass/main.scss')
+        .src('src/sass/**/*.scss')
         .pipe(sass(
             {
                 outputStyle: 'compressed'
             }
-        ))
+        ).on('error', sass.logError))
         .pipe(gulp.dest('dist/css/'))
+        .pipe(browserSync.stream());
 }
 
 // WATCH
-function watchFiles() {
+function watch() {
+    browserSync.init({
+        server: {
+            baseDir: './dist'
+        }
+    });
+
     gulp.watch('./src/index.html', htmlMin);
-    gulp.watch('./src/sass/main.scss', compileSass);
+    // Alternative for not minified html
+    gulp.watch('./src/index.html').on('change', browserSync.reload);
+    gulp.watch('./src/sass/**/*.scss', compileSass);
 }
 
 // Exporting tasks
 exports.htmlMin = htmlMin;
 exports.compileSass = compileSass;
+exports.watch = watch;
