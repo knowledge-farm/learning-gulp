@@ -29,7 +29,7 @@ function compileSass() {
 
 // WATCH
 function watchFiles() {
-    gulp.watch('.src/index.html', htmlMin);
+    gulp.watch('./src/index.html', htmlMin);
     gulp.watch('./src/sass/main.scss', compileSass);
 }
 
